@@ -1,29 +1,75 @@
+{{!-- The tag below means - insert everything in this file into the {body} of the default.hbs template --}}
 {{!< default}}
 
-<div class="content-area">
-    <main class="site-main">
-        <header class="feed-header container medium">
-            {{#if @custom.feed_title}}
-                <div class="feed-header-wrapper">
-                    <h2 class="feed-header-title">{{@custom.feed_title}}</h2>
-                </div>
-            {{/if}}
-        </header>
+{{^is "paged"}}
+	{{#get "posts" include="tags,authors" filter="featured:true" limit="5"}}
+		{{#if posts}}
+			<div class="intro">
+				<div class="swiper-container">
+					<ul class="swiper-wrapper">
+						{{#foreach posts}}
+							<li class="swiper-slide">
+								{{> "loop-featured"}}
+							</li>
+						{{/foreach}}
+					</ul>
+					<div class="swiper-pagination"></div>
+					<a href="#" class="go"><i class="fas fa-angle-down"></i></a>
+				</div>
+			</div>
+		{{else}}
+			<div class="intro">
+				<div class="swiper-container">
+					<div class="swiper-wrapper">
+						<li class="swiper-slide">
+							{{#if @site.cover_image}}
+							<style type="text/css">
+								.responsive-header-img {
+									background-image: url({{img_url @site.cover_image size='l'}});
+								}
+								@media(max-width: 991px) {
+									.responsive-header-img {
+										background-image: url({{img_url @site.cover_image size='m'}});
+										background-image: -webkit-image-set(
+											url({{img_url @site.cover_image size='m'}}) 1x,
+											url({{img_url @site.cover_image size='l'}}) 2x
+										);
+										background-image: image-set(
+											url({{img_url @site.cover_image size='m'}}) 1x,
+											url({{img_url @site.cover_image size='l'}}) 2x
+										);
+									}
+								}
+							</style>
+							{{/if}}
+							<div class="bg responsive-header-img"></div>
+							<div class="inner">
+								<div class="container">
+									<div class="row">
+										<div class="col-md-9">
+											<h1 class="post-title">{{@site.title}}</h1>
+											<p class="excerpt">{{@site.description}}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</li>
+					</div>
+					<a href="#" class="go"><i class="fas fa-angle-down"></i></a>
+				</div>
+			</div>
+		{{/if}}
+	{{/get}}
+{{/is}}
 
-        <div class="post-feed{{#match @custom.feed_layout "!=" "Minimal"}} expanded{{/match}}{{#match @custom.feed_layout "Right thumbnail"}} right-thumbnail{{/match}}{{#match @custom.feed_layout "Text-only"}} text-only{{/match}} container medium">
-            {{^unless @member}}
-                {{#foreach posts}}
-                    {{> "loop"}}
-                {{/foreach}}
-            {{else}}
-                {{#foreach posts}}
-                    {{> "loop"}}
-                {{/foreach}}
-            {{/unless}}
-        </div>
-
-        {{pagination}}
-    </main>
-</div>
-
-{{#contentFor "body_class"}}{{#if next}} paged-next{{/if}}{{#if @site.cover_image}} with-full-cover{{/if}}{{#if @member}} logged-in{{/if}}{{/contentFor}}
+{{!-- The main content area --}}
+<main id="content" class="container" role="main">
+	<div class="row">
+		<div class="col-lg-8 col-md-10 col-sm-12 ml-auto mr-auto loop">
+			{{#foreach posts}}
+    			{{> "loop"}}
+    		{{/foreach}}
+		</div>
+    </div>
+</main>
+{{pagination}}
